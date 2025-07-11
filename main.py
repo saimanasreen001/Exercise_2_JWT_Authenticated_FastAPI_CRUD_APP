@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from fastapi.security import OAuth2PasswordRequestForm # OAuth2PasswordRequestForm automatically extracts form data
 from datetime import timedelta
 from auth import(
-    get_current_user,create_access_token,get_password_hash,verify_password,ACCESS_TOKEN_EXPIRE_MINUTES
+    get_current_user,create_access_token,get_password_hash,verify_password,ACCESS_TOKEN_EXPIRE_MINUTES,HASHED_PASSWORD
 )
 
 app=FastAPI()
@@ -18,9 +18,10 @@ students={}
 fake_user_db={
     "admin":{
         "username":"admin",
-        "hashed_password":get_password_hash("admin123")
+        "hashed_password":HASHED_PASSWORD
     }
 }
+# print(get_password_hash("admin123"))
 
 @app.post("/token")
 def login(form_data:OAuth2PasswordRequestForm = Depends()): # form_data ={username:admin, password:admin123}
@@ -29,7 +30,7 @@ def login(form_data:OAuth2PasswordRequestForm = Depends()): # form_data ={userna
                                                     #     "hashed_password": "$2b$12$...hashed_password..."
                                               # }
     if not user or not verify_password(form_data.password,user["hashed_password"]):
-        raise HTTPException(status_code=400,detail="Incorrect username or password")
+        raise HTTPException(status_code=404,detail="Incorrect username or password")
     access_token=create_access_token(
         data={"sub":user["username"]}, #sub=admin
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -41,6 +42,7 @@ def login(form_data:OAuth2PasswordRequestForm = Depends()): # form_data ={userna
 
 #create
 @app.post("/students/{student_id}")
+#inside get_current_user (created in auth.py) from token, payload is fetched and then from payload username is fetched
 def create_student(student_id:int, student:Student,username:str=Depends(get_current_user)):
     if student_id in students:
         raise HTTPException(status_code=404, detail="Student already exist")

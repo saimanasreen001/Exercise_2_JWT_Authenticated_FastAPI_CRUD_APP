@@ -13,6 +13,7 @@ load_dotenv() # loading the environment variables.
 SECRET_KEY = os.getenv("SECRET_KEY","your_secret_key_here")
 ALGORITHM =os.getenv("ALGORITHM","HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES",30))
+HASHED_PASSWORD = os.getenv("HASHED_PASSWORD")
 
 # CryptContext is a class from passlib library which is used to hash password and verify password
 pwd_context= CryptContext(schemes=["bcrypt"],deprecated="auto")
@@ -37,7 +38,7 @@ def create_access_token(data:dict, expires_delta:timedelta=None):
 def decode_access_token(token:str):
         try:
             payload=jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
-            return payload
+            return payload # contains username, expiry time payload={"sub":"admin", "exp":expiry time}
         except JWTError:
              return None
         
@@ -49,10 +50,10 @@ def get_current_user(token:str=Depends(oauth2_scheme)):# Depends tell before run
           detail="Could not validate credentials",
           headers={"WWW-Authenticate":"Bearer"}
      )
-     payload=decode_access_token(token)
+     payload=decode_access_token(token) #payload={"sub":"admin", "exp":expiry time}
      if payload is None:
           raise credentials_exception
-     username: str=payload.get("sub")
+     username: str=payload.get("sub") #username:admin
      if username is None:
           raise credentials_exception
      
