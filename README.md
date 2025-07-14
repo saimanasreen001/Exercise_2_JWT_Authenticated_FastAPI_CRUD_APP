@@ -15,8 +15,9 @@
 
 ## WorkFlow
 
-    The FastAPI CRUD App needs to be authenticated with the JWT tokens. Before doing the operations, an authorised user logins and access token is generated.
-    1. Login route is created where authorised user logins and authorises and generates access tokens.
+    The FastAPI CRUD App needs to be authenticated with the JWT tokens. 
+    1. Login route is created where user from my_fake_db logins and access token is generated.
+    2. While authorising, bearer token is fetched and username is decoded.
     2. Authorised user then can perform all the CRUD operations within Access token expiry minutes.
 
 ## Setup instructions

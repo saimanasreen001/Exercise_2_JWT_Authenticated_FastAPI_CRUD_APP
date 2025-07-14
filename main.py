@@ -1,19 +1,22 @@
+## FastAPI -- Web framework used to build Python APIs. It is fast. Gives Swagger UI.
+## JWT     -- manages user identity and access in applications.
 from fastapi import FastAPI, HTTPException, Depends # Depends is used inside a function. Function written inside Depends is executed first and then the main function.
-from pydantic import BaseModel
+                                                    # HTTPException is used to raise HTTP errors.
+from pydantic import BaseModel # used to define data models.
 from fastapi.security import OAuth2PasswordRequestForm # OAuth2PasswordRequestForm automatically extracts form data
-from datetime import timedelta
+from datetime import timedelta # creates time durations.
 from auth import(
-    get_current_user,create_access_token,get_password_hash,verify_password,ACCESS_TOKEN_EXPIRE_MINUTES,HASHED_PASSWORD
+    get_password_hash,verify_password,create_access_token,get_current_user,ACCESS_TOKEN_EXPIRE_MINUTES,HASHED_PASSWORD
 )
 
 app=FastAPI()
 
-class Student(BaseModel):
+class Student(BaseModel): # a Student object includes
     name:str
     gender:str
     age:int
 
-students={}
+students={} # empty dictionary.
 
 fake_user_db={
     "admin":{
@@ -21,10 +24,14 @@ fake_user_db={
         "hashed_password":HASHED_PASSWORD
     }
 }
-# print(get_password_hash("admin123"))
+print(get_password_hash("admin123"))
 
 @app.post("/token")
-def login(form_data:OAuth2PasswordRequestForm = Depends()): # form_data ={username:admin, password:admin123}
+def login(form_data:OAuth2PasswordRequestForm = Depends()): # OAuth2PasswordRequestForm automatically fetches form data
+                                                            # form_data ={
+                                                                # username:admin,
+                                                                # password:admin123
+                                                            #}
     user=fake_user_db.get(form_data.username) # user= {
                                                     #     "username": "admin",
                                                     #     "hashed_password": "$2b$12$...hashed_password..."

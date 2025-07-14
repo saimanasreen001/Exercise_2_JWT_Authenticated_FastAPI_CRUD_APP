@@ -18,18 +18,18 @@ HASHED_PASSWORD = os.getenv("HASHED_PASSWORD")
 # CryptContext is a class from passlib library which is used to hash password and verify password
 pwd_context= CryptContext(schemes=["bcrypt"],deprecated="auto")
 
-def get_password_hash(password):
+def get_password_hash(password): # returns hashed password
     return pwd_context.hash(password)
 
-def verify_password(plain_password,hashed_password):
-    return pwd_context.verify(plain_password,hashed_password)
+def verify_password(plain_password,hashed_password): # checks whether hashed password is encrypted version of plain password
+    return pwd_context.verify(plain_password,hashed_password) # returns true/false
 
 # data is a dictionary which contains user info like data={"sub":"Admin"} 
 def create_access_token(data:dict, expires_delta:timedelta=None):
     to_encode=data.copy() # A copy of data dictionary is created as dictionaries are mutable. If not created copy, values in both will change.
-    if expires_delta: # if expiry time is present, simply add expiry time to the current time.
+    if expires_delta:     # if expiry time is present, simply add expiry time to the current time.
         expire = datetime.utcnow() + expires_delta
-    else:             # else add 15 minutes to the current time as the expiry time.
+    else:                 # else add 15 minutes to the current time as the expiry time.
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp":expire}) # update to_encode with expiry time as to_encode={"sub":"Admin","exp":"the expiry time"}
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm= ALGORITHM) # jwt token created with to_encode and others
